@@ -27,7 +27,7 @@ library("plotly")
 library("ggrepel")
 
 
-setwd("./tfm/resistance-MA")
+setwd("./tfm-bioinfo/resistance-MA")
 
 # load salmon output (gse objects)
 load("./salmon-output-resistance.RData")
