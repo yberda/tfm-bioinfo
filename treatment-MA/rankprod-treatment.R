@@ -10,7 +10,7 @@ library('ggforce')
 setwd('tfm-bioinfo/treatment-MA')
 
 # load data
-load('rankprod-data.RData')
+load('rankprod-data-treatment.RData')
 
 # this script contains the Rankprod and Ranksum metaanalyses and some 
 # comparisons with TE-MA
