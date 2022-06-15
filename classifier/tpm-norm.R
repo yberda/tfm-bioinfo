@@ -6,7 +6,7 @@ library("edgeR")
 
 
 # set working directory
-setwd("./tfm/classifier")
+setwd("./tfm-bioinfo/classifier")
 
 # load salmon output: RangedSummarizedExperiment and DGEList objects
 load('salmon-output-classifier.RData')
