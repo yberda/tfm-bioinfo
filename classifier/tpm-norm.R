@@ -22,8 +22,9 @@ data.clas <- merge(assay(gse.singleton, "abundance"),
     merge(assay(gse.song.clas, "abundance"), by.x = "Row.names", by.y = 0) %>%
     merge(assay(gse.tsoi.clas, "abundance"), by.x = "Row.names", by.y = 0) %>%
     merge(assay(gse.coppe.clas, "abundance"), by.x = "Row.names", by.y = 0) %>%
+    merge(assay(gse.wang.clas, "abundance"), by.x = "Row.names", by.y = 0) %>%
     merge(assay(gse.waizenegger.clas, "abundance"), 
-          by.x = "Row.names", by.y = 0)
+                                           by.x = "Row.names", by.y = 0)
 
 rownames(data.clas) <- as.vector(mapply(data.clas$Row.names, FUN = function(x) {
     gsub("\\.\\d+", "", x)
@@ -46,6 +47,8 @@ colnames(data.clas) <- c(
         y.tsoi.clas$samples$treatment, sep = "."), 
   paste("coppe", y.coppe.clas$samples$names, y.coppe.clas$samples$cell, 
         y.coppe.clas$samples$treatment, sep = "."), 
+  paste("wang", y.wang.clas$samples$names, y.wang.clas$samples$cell, 
+        y.wang.clas$samples$treatment, sep = "."),
   paste("waizenegger", y.waizenegger.clas$samples$names, 
         y.waizenegger.clas$samples$cell, 
         y.waizenegger.clas$samples$treatment, sep = "."))
@@ -80,16 +83,16 @@ write.table(data.clas.norm.constr, quote = FALSE, sep = "\t",
             file = "data/norm-data-tpms.txt")
 
 
-## retrieve double drug resistance data to validate the classifier
+## retrieve double-drug resistance data to validate the classifier
 ddr.norm <- data.clas.norm[inter.genes, 
                             grepl("DR", colnames(data.clas.norm))][ , -5]
 ddr.norm <- as.data.frame(t(ddr.norm))
-ddr.norm$phenotype <- rep('R', 4)
+ddr.norm$phenotype <- rep('R', 5)
 dim(ddr.norm)
 
 # save table
 write.table(ddr.norm, quote = FALSE, sep = "\t", 
-            file = "data/ddr-cell.txt")
+            file = "data/ddr.txt")
 
 
 ## retrieve waizenegger data to validate the classifier
@@ -238,10 +241,10 @@ hugo.pt.clas.norm$phenotype <- treat.hugo.pt.clas
 dim(hugo.pt.clas.norm)
 
 # select only parental and single-drug resistant tumors
-hugo.pt.clas.norm <- 
-        hugo.pt.clas.nordim(hugo.pt.clas.norm)m[!grepl('DR', rownames(hugo.pt.clas.norm)), ]
+hugo.pt.clas.norm <- hugo.pt.clas.norm[!grepl('DR',
+                                              rownames(hugo.pt.clas.norm)), ]
 dim(hugo.pt.clas.norm)
 
 # save table
-write.table(hugo.pt.clas.norm[-c(62, 63),], quote = FALSE, sep = "\t", 
+write.table(hugo.pt.clas.norm, quote = FALSE, sep = "\t", 
             file = "data/hugo-pt.txt")
