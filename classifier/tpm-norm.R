@@ -6,7 +6,7 @@ library("edgeR")
 
 
 # set working directory
-setwd("./tfm-bioinfo/classifier")
+setwd("./tfm/classifier")
 
 # load salmon output: RangedSummarizedExperiment and DGEList objects
 load('salmon-output-classifier.RData')
@@ -78,6 +78,18 @@ data.clas.norm.constr$phenotype <- pheno[!grepl("Pt|pdx|DR|DTP|DTPP|BRAF",
 # save table
 write.table(data.clas.norm.constr, quote = FALSE, sep = "\t",
             file = "data/norm-data-tpms.txt")
+
+
+## retrieve double drug resistance data to validate the classifier
+ddr.norm <- data.clas.norm[inter.genes, 
+                            grepl("DR", colnames(data.clas.norm))][ , -5]
+ddr.norm <- as.data.frame(t(ddr.norm))
+ddr.norm$phenotype <- rep('R', 4)
+dim(ddr.norm)
+
+# save table
+write.table(ddr.norm, quote = FALSE, sep = "\t", 
+            file = "data/ddr-cell.txt")
 
 
 ## retrieve waizenegger data to validate the classifier
@@ -223,6 +235,11 @@ dim(hugo.pt.clas.norm)
 
 hugo.pt.clas.norm <- as.data.frame(t(hugo.pt.clas.norm[inter.genes, ]))
 hugo.pt.clas.norm$phenotype <- treat.hugo.pt.clas
+dim(hugo.pt.clas.norm)
+
+# select only parental and single-drug resistant tumors
+hugo.pt.clas.norm <- 
+        hugo.pt.clas.nordim(hugo.pt.clas.norm)m[!grepl('DR', rownames(hugo.pt.clas.norm)), ]
 dim(hugo.pt.clas.norm)
 
 # save table
