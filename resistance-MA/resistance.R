@@ -762,7 +762,11 @@ par(mfrow = c(1, 1))
 # correlation between the data two-by-two 
 # ! these correlations were computed taking into account all the genes, 
 # not only DEGs
-cor.matrix.lfc <- cor(lfc.genes[, -9], use = "pairwise.complete.obs")
+lfc.genes.pw.cor <- lfc.genes[,-9]
+colnames(lfc.genes.pw.cor) <- c('Si.A375R', 'H.451LuR', 'H.A375R', 'B.MM074R', 
+                              'So.M229R', 'So.M238R', 'S.M395R', 'S.SKMEL28R')
+
+cor.matrix.lfc <- cor(lfc.genes.pw.cor, use = "pairwise.complete.obs")
 col4 <- colorRampPalette(c("yellow2", "white", "purple4"))(50)
 cor.pheat <- pheatmap(cor.matrix.lfc, col = col4, display_numbers = TRUE, 
                       breaks = seq(-1, 1, length = 50))
