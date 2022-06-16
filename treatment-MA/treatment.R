@@ -1469,8 +1469,12 @@ dim(diff.genes.btw)
 
 # heatmap 
 lfc.genes.subgdiff <- lfc.genes[rownames(diff.genes.btw), -15]
-colnames(lfc.genes.subgdiff) <- sub("treatment", "MAPKi", 
-                                    colnames(lfc.genes.subgdiff))
+colnames(lfc.genes.subgdiff) <-  c('O.A375.6', 'O.A375.48', 'O.Colo800.48',  
+                                   'O.UACC62.48', 'F.Colo858.24', 
+                                   'F.Colo858.48', 'F.MMACSF.24', 
+                                   'F.MMACSF.48', 'C.501Mel.48',
+                                   'G.A375.24', 'Sm.WM164.8', 'R.A375.8', 
+                                   'S.M229.48', 'S.M238.48')
 p.subgdiff <- pheatmap(lfc.genes.subgdiff, col = col.hm, 
                        cluster_rows = TRUE, cluster_cols = TRUE,
                        breaks = seq(-2, 2, length = 50), 
@@ -1841,7 +1845,12 @@ kegg.cell.cycle.ensemblid <- merge(kegg.cell.cycle, list.genes, by.x = "V1",
 kegg.cell.cycle.ensemblid <-intersect(kegg.cell.cycle.ensemblid$ensembl_gene_id,
                                                             rownames(lfc.genes))
 lfc.cell.cycle <- lfc.genes[kegg.cell.cycle.ensemblid, -15]
-colnames(lfc.cell.cycle) <- sub("treatment", "MAPKi", colnames(lfc.cell.cycle))
+colnames(lfc.cell.cycle) <- c('O.A375.6', 'O.A375.48', 'O.Colo800.48',  
+                               'O.UACC62.48', 'F.Colo858.24', 
+                               'F.Colo858.48', 'F.MMACSF.24', 
+                               'F.MMACSF.48', 'C.501Mel.48',
+                               'G.A375.24', 'Sm.WM164.8', 'R.A375.8', 
+                               'S.M229.48', 'S.M238.48')
 
 # plot
 col.hm <- colorRampPalette(c("green", "black", "red"))(50)
@@ -2243,8 +2252,10 @@ figure2
 # ! these correlations were computed taking into account all the genes, 
 # not only DEGs
 cor.matrix.long.lfc <- cor(lfc.genes.long[, -12], use = "pairwise.complete.obs")
-colnames(cor.matrix.long.lfc) <- sub("treatment", "MAPKi", 
-                                                 colnames(cor.matrix.long.lfc))
+colnames(cor.data.matrix) <- c('O.A375.48', 'O.Colo800.48', 'O.UACC62.48', 
+                               'F.Colo858.24', 'F.Colo858.48', 'F.MMACSF.24',
+                               'F.MMACSF.48', 'C.501Mel.48', 'G.A375.24',
+                               'S.M229.48', 'S.M238.48')
 rownames(cor.matrix.long.lfc) <- sub("treatment", "MAPKi", 
                                                  rownames(cor.matrix.long.lfc))
 
@@ -3008,8 +3019,11 @@ lfc.genes.long.sy.actomy <- lfc.genes.long.sy.actomy[, -1]
 dim(lfc.genes.long.sy.actomy)
 rownames(lfc.genes.long.sy.actomy) <- lfc.genes.long.sy.actomy$hgnc_symbol
 lfc.genes.long.sy.actomy <- lfc.genes.long.sy.actomy[, -1]
-colnames(lfc.genes.long.sy.actomy) <- sub("treatment", "MAPKi", 
-                                          colnames(lfc.genes.long.sy.actomy))
+colnames(lfc.genes.long.sy.actomy) <- c('O.A375.48', 'O.Colo800.48',  
+                                        'O.UACC62.48', 'F.Colo858.24', 
+                                        'F.Colo858.48', 'F.MMACSF.24', 
+                                        'F.MMACSF.48', 'C.501Mel.48',
+                                        'G.A375.24', 'S.M229.48', 'S.M238.48')
 
 pheatmap(na.omit(lfc.genes.long.sy.actomy), col = col.hm, show_rownames = TRUE, 
          breaks = seq(-4, 4, length = 50), fontsize_col = 15, border_color = NA)
