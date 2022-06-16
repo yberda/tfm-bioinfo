@@ -1,8 +1,8 @@
 # load libraries
-library("readr")
 library("dplyr")
 
 library("edgeR")
+library("limma")
 
 
 # set working directory
@@ -127,7 +127,7 @@ song.pt.norm <- data.clas.norm[inter.genes,
 song.pt.norm <- as.data.frame(t(song.pt.norm))
 song.pt.norm$phenotype <- pheno[(grepl("song", colnames(data.clas.norm)) & 
                                    grepl("Pt", colnames(data.clas.norm)))]
-song.pt.norm$phenotype <- gsub('DR', 'R', song.pt.norm$phenotype )
+song.pt.norm <- song.pt.norm[!grepl('DR', song.pt.norm$phenotype), ]
 dim(song.pt.norm)
 
 # save table 
