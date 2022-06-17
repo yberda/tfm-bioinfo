@@ -1245,8 +1245,9 @@ paired.plot.df <- data.frame(ES = c(gsva.resistance.avg.clean),
 
 paired.plot <- ggplot(paired.plot.df, aes(x = group, y = ES, label = lines)) + 
   geom_line(aes(group = lines), color = "darkgrey") + 
-  geom_point(size = 2, aes(color = group)) + scale_x_discrete("") + 
-  scale_color_manual(values = c("darkblue", "darkblue")) + theme_bw() + 
+  geom_point(size = 2, aes(color = lines)) + scale_x_discrete("") + 
+  scale_color_manual(values = c("darkblue", "red", "red", "red", "red", 
+                                "darkblue", "darkblue", "red")) + theme_bw() + 
   theme(legend.position = "none", axis.text = element_text(size = 14), 
         axis.title = element_text(size = 14)) +
   ylab("NES") + ylim(c(1, 2.25)) + 
@@ -1421,6 +1422,11 @@ p.ddr.inter.cc
 p.ddr.inter.2 <- dotplot(ans.go.ddr.inter.cc, showCategory = 25)
 p.ddr.inter.2
 
+# intersection with the actomyosin network
+actomyosin.ensemblid$hgnc_symbol[
+  actomyosin.ensemblid$ensembl_gene_id %in% 
+    intersect(inter.ddr, actomyosin.ensemblid$ensembl_gene_id)]
+
 
 ################################################################################
 #              4. TREATMENT vs. RESISTANCE METAANALYSIS                        #
@@ -1515,35 +1521,6 @@ actomyosin <- actomyosin$V1
 
 # intersection
 intersect(res.meta.treat.resist$hgnc_symbol, actomyosin)  # only CIT
-
-
-# ## comparison treatment vs. Subgroup A metaanalyses
-# 
-# inter.genes.treat.subA <- intersect(inter.genes.long, degs.5st)
-# 
-# ggVennDiagram(list(Tratamiento = inter.genes.long, Resistencia = degs.5st), 
-#               label_alpha = 0, label = "count", set_size = 7, label_size = 7) + 
-#   scale_fill_gradient(low = alpha("forestgreen", 0.7), 
-#                       high = alpha("coral2", 0.7)) + 
-#   scale_color_manual(values = c(TreatmentMA = "gray", esistanceMA = "gray")) + 
-#   theme_void() + theme(legend.position = "none")
-# 
-# ## heatmap
-# res.meta.treat.subA <- merge(res.meta.long.df[inter.genes.treat.subA, 
-#                                                            "lfc", drop = FALSE],
-#                               res.meta.resist.subA.df[inter.genes.treat.subA,
-#                                                    "lfc", drop = FALSE], by = 0)
-# res.meta.treat.subA <- merge(list.genes, res.meta.treat.subA, 
-#                               by.x = "ensembl_gene_id", by.y = "Row.names", 
-#                               all.y = TRUE)
-# rownames(res.meta.treat.subA) <- paste(res.meta.treat.subA$ensembl_gene_id, 
-#                                         res.meta.treat.subA$hgnc_symbol, 
-#                                         sep = " - ")
-# colnames(res.meta.treat.subA)[3:4] <- c("Treatment", "Resistance")
-# 
-# pheatmap(res.meta.treat.subA[, 3:4][abs(res.meta.treat.subA[, 3]) > 1.5 | 
-#     abs(res.meta.treat.subA[, 4]) > 1.5, ], color = col.hm, border_color = NA, 
-#     breaks = seq(-4, 4, length = 50), cluster_cols = FALSE, cluster_rows = TRUE)
 
 
 ################################################################################
@@ -2361,6 +2338,100 @@ forest.meta(genes.meta.resist.subA[['ENSG00000105357']],
             print.I2 = FALSE,
             print.pval.Q = FALSE)
 
+
+# ------------------- treatment vs. Subgroup A resistance ----------------------
+
+# venn diagram to compare treatment and resistance DEGs
+ggVennDiagram(list(treatment = inter.genes.long, 
+                   resistance = degs.5st),
+              label_alpha = 0, label = "count", set_size = 6, label_size = 7) + 
+  scale_fill_gradient(low = alpha("steelblue3", 0.7), high = "steelblue3") + 
+  scale_color_manual(values = c(TreatmentMA = "gray", ResistanceMA = "gray")) + 
+  theme_void() + theme(legend.position = "none")
+
+## heatmap
+
+# merge data to be compared
+inter.genes.treat.resist.subA <- intersect(inter.genes.long, degs.5st)
+
+res.meta.treat.resist.subA <- merge(res.meta.long.df[
+                          inter.genes.treat.resist.subA, "lfc", drop = FALSE], 
+                              res.meta.resist.subA.df[
+                  inter.genes.treat.resist.subA, "lfc", drop = FALSE], by = 0)
+res.meta.treat.resist.subA <- merge(list.genes, res.meta.treat.resist.subA, 
+                    by.x = "ensembl_gene_id", by.y = "Row.names", all.y = TRUE)
+
+rownames(res.meta.treat.resist.subA) <- 
+  paste(res.meta.treat.resist.subA$ensembl_gene_id, 
+                           res.meta.treat.resist.subA$hgnc_symbol, sep = " - ")
+colnames(res.meta.treat.resist.subA)[3:4] <- c("treatment", "resistance")
+
+# select only genes with abs(LFC) > 1.5 in "treatment" or "resistance" and plot
+# (heatmap)
+pheatmap(res.meta.treat.resist.subA[, 3:4][
+                                abs(res.meta.treat.resist.subA[, 3]) > 1.5 | 
+                                  abs(res.meta.treat.resist.subA[, 4]) > 1.5, ], 
+         color = col.hm, border_color = NA, breaks = seq(-4, 4, length = 50),
+         cluster_cols = FALSE, cluster_rows = TRUE, fontsize_col = 15)
+
+
+## association test: treatment and Subgroup A resistance DEGs
+
+# contingency table
+#                ..............................
+#                | DEGs_res_yes | DEGs_res_no |
+# .............................................
+# DEGs_treat_yes |    A = 174   |  C = 3309   |
+# .............................................
+# DEGs_treat_no  |    B = 487   |  D = 22519  |
+# .............................................
+
+# numbers
+A.2 <- length(intersect(inter.genes.long, degs.5st))
+B.2 <- length(intersect(degs.5st, setdiff(rownames(res.meta.long.df), 
+                                                  inter.genes.long)))
+C.2 <- length(intersect(inter.genes.long, 
+                        setdiff(rownames(res.meta.resist.subA.df), degs.5st)))
+D.2 <- length(intersect(setdiff(rownames(res.meta.long.df), inter.genes.long), 
+                      setdiff(rownames(res.meta.resist.subA.df), degs.5st)))
+
+# data frame
+treat.res.subA.assoc <- data.frame(DEGs_res_yes = c(A.2, B.2), 
+                                   DEGs_res_no = c(C.2, D.2), 
+                              row.names = c("DEGs_treat_yes", "DEGs_treat_no"), 
+                              stringsAsFactors = FALSE)
+
+# fisher test
+f.test.subA <- fisher.test(treat.res.subA.assoc)
+f.test.subA
+
+# mosaic plot
+mosaicplot(treat.res.subA.assoc,
+           main = "Mosaic plot",
+           color = c("navyblue", "salmon"), 
+           xlab ="Treatment", 
+           ylab = "Resistance")
+
+
+## GO terms enrichment (intersection treatment & subA resistance)
+# no results (BP/CC)
+ans.go.treat.resist.subA <- enrichGO(gene = inter.genes.treat.resist.subA, 
+                                keyType = "ENSEMBL", 
+                                ont = "CC", 
+                                OrgDb = "org.Hs.eg.db", 
+                                universe = rownames(res.meta.resist.subA.df),
+                                readable = TRUE, 
+                                pAdjustMethod = "BH", 
+                                pvalueCutoff = 0.05)
+tab.go.treat.resist.subA <- as.data.frame(ans.go.treat.resist.subA)
+head(tab.go.treat.resist)
+
+
+## intersection vs. the cytoskeleton list
+intersect(res.meta.treat.resist.subA$hgnc_symbol, actomyosin)  # only CIT,
+                                                               # ARHGEF10L,
+                                                               # ARHGEF17 and
+                                                               # ITGA9
 
 
 # ------------------Subgroup B metaanalyses: Song M395R, -----------------------
