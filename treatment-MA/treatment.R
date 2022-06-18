@@ -1577,7 +1577,9 @@ tfea.data <- tfea.data[order(tfea.data$lfc, decreasing = TRUE), ]
 tfea.data <- tfea.data[, -1]
 colnames(tfea.data) <- c("Genes", "log2FoldChange", "pvalue", "pval.adj")
 
-# UP-regulated genes extract vector with names of upregulated genes
+## UP-regulated genes 
+
+# extract vector with names of upregulated genes
 genes.upreg <- Select_genes(tfea.data, min_LFC = 1)
 
 # extract vector with names of non-responsive genes
@@ -1609,7 +1611,9 @@ col.up <- sample(viridis::turbo(length(tfs.up)), length(tfs.up))
 # plot p-values against ORs highlighting indicated TFs
 plot_CM(pval_mat_UP, specialTF = tfs.up, TF_colors = col.up)  
 
-# DOWN-regulated genes extract vector with names of upregulated genes
+## DOWN-regulated genes 
+
+# extract vector with names of upregulated genes
 genes.downreg <- Select_genes(tfea.data, max_LFC = -1)
 # extract vector with names of non-responsive genes
 genes.control <- Select_genes(tfea.data, min_pval = 0.5, max_pval = 1, 
@@ -2699,7 +2703,9 @@ tfea.data.long <- tfea.data.long[order(tfea.data.long$lfc, decreasing = TRUE), ]
 tfea.data.long <- tfea.data.long[, -1]
 colnames(tfea.data.long) <- c("Genes", "log2FoldChange", "pvalue", "pval.adj")
 
-# UP-regulated genes extract vector with names of upregulated genes
+## UP-regulated genes 
+
+# extract vector with names of upregulated genes
 genes.upreg.long <- Select_genes(tfea.data.long, min_LFC = 1)
 
 # extract vector with names of non-responsive genes
@@ -2733,7 +2739,9 @@ plot_CM(pval_mat_UP_long, specialTF = tfs.up.long, TF_colors = col.up.long)
 TF_ranking_up_long[["TFranking_plot"]]
 
 
-# DOWN-regulated genes extract vector with names of upregulated genes
+## DOWN-regulated genes 
+
+# extract vector with names of upregulated genes
 genes.downreg.long <- Select_genes(tfea.data.long, max_LFC = -1)
 # extract vector with names of non-responsive genes
 genes.control.long <- Select_genes(tfea.data.long, min_pval = 0.5, max_pval = 1,
