@@ -1131,10 +1131,11 @@ colnames(counts.df) <- c(paste("singleton", y.singleton$samples$cell,
 # read resistance signature
 res.sig <- read.table("data/resistance-sig.grp")
 
-# get symbols
+## get symbols
+# list all the genes first
 list.genes <- getBM(attributes = c("hgnc_symbol", "ensembl_gene_id"), 
-                    values = rownames(res.meta.resist.df),
                     mart = mart)
+# retrieve signature genes
 res.sig.ensemblid <- list.genes[which(list.genes$hgnc_symbol %in% res.sig$V1), ]
 sign <- list(c(res.sig.ensemblid$ensembl_gene_id))
 
@@ -1385,14 +1386,16 @@ ggVennDiagram(list(SDR = degs.8st,
 inter.ddr <- intersect(rownames(genes.ddr)[genes.ddr$adj.P.Val < 0.05], 
                        degs.8st)
 
-inter.ddr.lfc <- merge(res.meta.resist.df[inter.ddr, "lfc", drop = FALSE], 
-                       genes.ddr[inter.ddr, "logFC", drop = FALSE], by = 0)
-rownames(inter.ddr.lfc) <- paste(inter.ddr.lfc$Row.names, 
-                                 list.genes[list.genes$ensembl_gene_id %in%
-                                   inter.ddr.lfc$Row.names, "hgnc_symbol"], 
-                                 sep = " - ")
-inter.ddr.lfc <- inter.ddr.lfc[, -1]
-colnames(inter.ddr.lfc) <- c("SDR", "DDR")
+inter.ddr.lfc <- merge(res.meta.resist.df[inter.ddr, 'lfc', drop = FALSE], 
+                       genes.ddr[inter.ddr, 'logFC', drop = FALSE], by = 0)
+
+# add symbols
+inter.ddr.lfc <- merge(list.genes, inter.ddr.lfc, by.x = 'ensembl_gene_id',
+                       by.y = 'Row.names', all.y = TRUE)
+
+rownames(inter.ddr.lfc) <- paste(inter.ddr.lfc$ensembl_gene_id, inter.ddr.lfc$hgnc_symbol, sep = ' - ')
+inter.ddr.lfc <- inter.ddr.lfc[ , -c(1, 2)]
+colnames(inter.ddr.lfc) <- c('SDR', 'DDR')
 
 # select genes with a LFC > 1.5 or < -1.5 in any of the conditions
 inter.ddr.lfc.sel <- inter.ddr.lfc[abs(inter.ddr.lfc$SDR) > 1.5 | 
@@ -2077,7 +2080,8 @@ tfea.data.subA <- tfea.data.subA[order(tfea.data.subA$lfc,
 tfea.data.subA <- tfea.data.subA[, -1]
 colnames(tfea.data.subA) <- c("Genes", "log2FoldChange", "pvalue", "pval.adj")
 
-# UP-regulated genes extract vector with names of upregulated genes
+## UP-regulated genes
+# extract vector with names of upregulated genes
 genes.upreg.subA <- Select_genes(tfea.data.subA, min_LFC = 1)
 
 # extract vector with names of non-responsive genes
@@ -2114,7 +2118,8 @@ plot_CM(pval_mat_UP_subA, specialTF = tfs.up.subA, TF_colors = col.up.subA)
 TF_ranking_up_subA[["TFranking_plot"]]
 
 
-# DOWN-regulated genes extract vector with names of upregulated genes
+## DOWN-regulated genes 
+# extract vector with names of upregulated genes
 genes.downreg.subA <- Select_genes(tfea.data.subA, max_LFC = -1)
 
 # extract vector with names of non-responsive genes
@@ -2358,6 +2363,7 @@ res.meta.treat.resist.subA <- merge(res.meta.long.df[
                           inter.genes.treat.resist.subA, "lfc", drop = FALSE], 
                               res.meta.resist.subA.df[
                   inter.genes.treat.resist.subA, "lfc", drop = FALSE], by = 0)
+
 res.meta.treat.resist.subA <- merge(list.genes, res.meta.treat.resist.subA, 
                     by.x = "ensembl_gene_id", by.y = "Row.names", all.y = TRUE)
 
@@ -2690,28 +2696,6 @@ for (i in 1:3) {
 par(mfrow = c(1, 1))
 
 
-# histogram to compare these new correlations vs. what we obtained before
-cor.res.compare <- data.frame(cor = cor.res.degs.8st[, 1], group = rep("R"))
-cor.res.compare <- rbind(cor.res.compare, 
-                         data.frame(cor = cor.res.degs.5st[, 1],
-    group = rep("subA")), data.frame(cor = cor.res.degs.3st[, 1], 
-                                      group = rep("subB")))
-
-p.hist <- ggplot(data = cor.res.compare, aes(x = cor, fill = group)) + 
-  geom_histogram(aes(y = 0.1 * ..density..), color = "black", alpha = 0.5, 
-                 position = "identity", binwidth = 0.1) +
-    scale_fill_brewer(palette = "Set1", breaks = c("R", "subA", "subB"), 
-                      labels = c("All", "Subgroup A", "Subgroup B")) + 
-  xlim(c(0, 1)) + theme_light() + 
-  theme(plot.title = element_text(hjust = 0.6, size = 20), 
-        axis.title = element_text(size = 12), 
-        axis.text = element_text(size = 12), legend.title = element_blank()) + 
-  xlab("Pearson correlation coefficient") +
-    ylab("Relative Frequency")
-
-p.hist
-
-
 # select DEGs from metaanalyses and from the experiments and compare medians
 
 ## metaanalyses
@@ -2939,7 +2923,9 @@ tfea.data.subB <- tfea.data.subB[, -1]
 colnames(tfea.data.subB) <- c("Genes", "log2FoldChange", "pvalue", "pval.adj")
 
 
-# UP-regulated genes extract vector with names of upregulated genes
+## UP-regulated genes 
+
+# extract vector with names of upregulated genes
 genes.upreg.subB <- Select_genes(tfea.data.subB, min_LFC = 1)
 
 # extract vector with names of non-responsive genes
@@ -2975,7 +2961,9 @@ plot_CM(pval_mat_UP_subB, specialTF = tfs.up.subB, TF_colors = col.up.subB)
 TF_ranking_up_subB[["TFranking_plot"]]
 
 
-# DOWN-regulated genes extract vector with names of upregulated genes
+## DOWN-regulated genes 
+
+# extract vector with names of upregulated genes
 genes.downreg.subB <- Select_genes(tfea.data.subB, max_LFC = -1)
 
 # extract vector with names of non-responsive genes
@@ -3116,3 +3104,30 @@ lfc.genes.subB.sy.actomy <- lfc.genes.subB.sy.actomy[, -c(1, 2)]
 p.heatmap.acto.subB <- pheatmap(na.omit(lfc.genes.subB.sy.actomy[, -6]), 
     col = col.hm, cluster_rows = TRUE, cluster_cols = TRUE, 
     show_rownames = TRUE, fontsize_col = 10, breaks = seq(-4, 4, length = 50))
+
+
+# ------ metaanalyses comparison of all data, Subgroup A and Subgroup B -------
+
+# histogram to compare these new correlations (Subgroup A and Subgroup B)
+# vs. what we obtained before
+
+cor.res.compare <- data.frame(cor = cor.res.degs.8st[, 1], group = rep("R"))
+
+cor.res.compare <- rbind(cor.res.compare, 
+                         data.frame(cor = cor.res.degs.5st[, 1],
+    group = rep("subA")), data.frame(cor = cor.res.degs.3st[, 1], 
+                                      group = rep("subB")))
+
+p.hist <- ggplot(data = cor.res.compare, aes(x = cor, fill = group)) + 
+  geom_histogram(aes(y = 0.1 * ..density..), color = "black", alpha = 0.5, 
+                 position = "identity", binwidth = 0.1) +
+    scale_fill_brewer(palette = "Set1", breaks = c("R", "subA", "subB"), 
+                      labels = c("All", "Subgroup A", "Subgroup B")) + 
+  xlim(c(0, 1)) + theme_light() + 
+  theme(plot.title = element_text(hjust = 0.6, size = 20), 
+        axis.title = element_text(size = 12), 
+        axis.text = element_text(size = 12), legend.title = element_blank()) + 
+  xlab("Pearson correlation coefficient") +
+    ylab("Relative Frequency")
+
+p.hist
