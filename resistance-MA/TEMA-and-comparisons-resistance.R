@@ -2081,6 +2081,7 @@ tfea.data.subA <- tfea.data.subA[, -1]
 colnames(tfea.data.subA) <- c("Genes", "log2FoldChange", "pvalue", "pval.adj")
 
 ## UP-regulated genes
+
 # extract vector with names of upregulated genes
 genes.upreg.subA <- Select_genes(tfea.data.subA, min_LFC = 1)
 
@@ -2119,6 +2120,7 @@ TF_ranking_up_subA[["TFranking_plot"]]
 
 
 ## DOWN-regulated genes 
+
 # extract vector with names of upregulated genes
 genes.downreg.subA <- Select_genes(tfea.data.subA, max_LFC = -1)
 
