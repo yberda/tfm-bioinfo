@@ -105,7 +105,7 @@ volcanoplot.colors.limma <- function(genes, adjpval = 0.05, logfc = 1.5,
 #    metaanalyses.
 # 2. Resistance metaanalyses: this section includes the effect sizes 
 #    metaanalyses, the exploration of the results (including the RankProd and 
-#    RankSum comparison and clusterProfiler, a resistance signature and cell  
+#    RankSum comparison and clusterProfiler, resistance signature and cell  
 #    cycle analysis) and a subgroup analysis.
 # 3. Double-drug resistant lines analysis and comparison
 # 4. Treatment vs. resistance metaanalyses: this section compares the results 
