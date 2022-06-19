@@ -764,7 +764,7 @@ par(mfrow = c(1, 1))
 # not only DEGs
 lfc.genes.pw.cor <- lfc.genes[,-9]
 colnames(lfc.genes.pw.cor) <- c('Si.A375R', 'H.451LuR', 'H.A375R', 'B.MM074R', 
-                              'So.M229R', 'So.M238R', 'S.M395R', 'S.SKMEL28R')
+                              'So.M229R', 'So.M238R', 'So.M395R', 'So.SKMEL28R')
 
 cor.matrix.lfc <- cor(lfc.genes.pw.cor, use = "pairwise.complete.obs")
 col4 <- colorRampPalette(c("yellow2", "white", "purple4"))(50)
