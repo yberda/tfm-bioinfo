@@ -9,7 +9,7 @@ library('ggforce')
 # set working directory
 setwd('tfm-bioinfo/treatment-MA')
 
-# load data
+# load transcriptomic data
 load('rankprod-data-treatment.RData')
 
 # this script contains the Rankprod and Ranksum metaanalyses and some 
